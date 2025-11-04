@@ -94,7 +94,12 @@
                         loc.name && loc.name.toLowerCase().includes('reference')
                     );
                     if (reference) {
-                        document.getElementById('reference-hours').textContent = reference.rendered || 'Closed';
+                        let hours = reference.rendered || 'Closed';
+                        // Remove periods and reformat for line breaks
+                        hours = hours.replace(/\./g, '');
+                        // Add line break between time ranges (before second occurrence of am/pm)
+                        hours = hours.replace(/(\d+(?:am|pm))\s*,?\s*(\d+)/i, '$1<br>$2');
+                        document.getElementById('reference-hours').innerHTML = hours;
                     }
                 }
             })
