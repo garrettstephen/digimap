@@ -25,11 +25,21 @@
 <body>
     <div class="hours-container">
         <h1>BYU Law Library Hours</h1>
-        <!-- LibCal Widget will go here -->
-        <div id="s-lc-whw"></div>
+        <!-- LibCal Today's Hours Widget -->
+        <div id="libcal-hours"></div>
     </div>
     
-    <!-- LibCal Hours Widget Script -->
-    <script src="https://law.byu.libcal.com/js/hours_grid.js"></script>
+    <!-- LibCal Today's Hours Script -->
+    <script>
+        fetch('https://law.byu.libcal.com/api_hours_today.php?lid=1098&format=html&systemTime=0')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('libcal-hours').innerHTML = data;
+            })
+            .catch(error => {
+                console.error('Error loading library hours:', error);
+                document.getElementById('libcal-hours').innerHTML = '<p>Unable to load hours at this time.</p>';
+            });
+    </script>
 </body>
 </html>
