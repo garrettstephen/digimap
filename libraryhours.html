@@ -68,48 +68,44 @@
         <h1>TODAY'S LIBRARY HOURS</h1>
         <div class="hours-grid">
             <div class="location">
-                <div class="location-name">MAIN FLOOR</div>
-                <div class="hours-time" id="main-floor-hours">Loading...</div>
+                <div class="location-name">LIBRARY</div>
+                <div class="hours-time" id="library-hours">Loading...</div>
             </div>
             <div class="divider"></div>
             <div class="location">
-                <div class="location-name">THIRD FLOOR</div>
-                <div class="hours-time" id="third-floor-hours">Loading...</div>
+                <div class="location-name">REFERENCE</div>
+                <div class="hours-time" id="reference-hours">Loading...</div>
             </div>
         </div>
     </div>
     
     <script>
-        // Fetch Main Floor hours (lid=1098)
-        fetch('https://law.byu.libcal.com/api_hours_today.php?lid=1098&format=json&systemTime=0')
+        // Fetch both library and reference hours (lid=0 gets all locations)
+        fetch('https://law.byu.libcal.com/api_hours_today.php?lid=0&format=json&systemTime=0')
             .then(response => response.json())
             .then(data => {
-                if (data && data.locations && data.locations[0]) {
-                    const location = data.locations[0];
-                    const rendered = location.rendered || 'Closed';
-                    document.getElementById('main-floor-hours').textContent = rendered;
+                if (data && data.locations) {
+                    // Find BYU Law Library (main library hours)
+                    const library = data.locations.find(loc => 
+                        loc.name && loc.name.toLowerCase().includes('byu law library')
+                    );
+                    if (library) {
+                        document.getElementById('library-hours').textContent = library.rendered || 'Closed';
+                    }
+                    
+                    // Find Law Library Reference hours
+                    const reference = data.locations.find(loc => 
+                        loc.name && loc.name.toLowerCase().includes('reference')
+                    );
+                    if (reference) {
+                        document.getElementById('reference-hours').textContent = reference.rendered || 'Closed';
+                    }
                 }
             })
             .catch(error => {
-                console.error('Error loading main floor hours:', error);
-                document.getElementById('main-floor-hours').textContent = 'N/A';
-            });
-
-        // You'll need to get the location ID for Third Floor/Reference
-        // For now, using a placeholder - replace with actual lid when you have it
-        fetch('https://law.byu.libcal.com/api_hours_today.php?lid=THIRD_FLOOR_LID&format=json&systemTime=0')
-            .then(response => response.json())
-            .then(data => {
-                if (data && data.locations && data.locations[0]) {
-                    const location = data.locations[0];
-                    const rendered = location.rendered || 'Closed';
-                    document.getElementById('third-floor-hours').textContent = rendered;
-                }
-            })
-            .catch(error => {
-                console.error('Error loading third floor hours:', error);
-                // Placeholder hours for now
-                document.getElementById('third-floor-hours').textContent = '7:00 AM - 6 PM';
+                console.error('Error loading library hours:', error);
+                document.getElementById('library-hours').textContent = 'N/A';
+                document.getElementById('reference-hours').textContent = 'N/A';
             });
     </script>
 </body>
