@@ -7,38 +7,109 @@
     <style>
         body {
             margin: 0;
-            padding: 20px;
-            background-color: #ffffff;
-            font-family: Arial, sans-serif;
+            padding: 40px 20px;
+            background-color: #d3d3d3;
+            font-family: 'Arial', sans-serif;
         }
         .hours-container {
             width: 100%;
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
+            text-align: center;
         }
         h1 {
-            color: #002e5d;
-            text-align: center;
+            color: #000000;
+            font-size: 2.5em;
+            font-weight: 300;
+            letter-spacing: 8px;
+            margin-bottom: 50px;
+            text-transform: uppercase;
+        }
+        .hours-grid {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            flex-wrap: wrap;
+        }
+        .location {
+            flex: 1;
+            min-width: 250px;
+            max-width: 350px;
+        }
+        .location-name {
+            font-size: 1.8em;
+            font-weight: 400;
+            color: #000000;
+            margin-bottom: 30px;
+            font-family: 'Georgia', serif;
+        }
+        .hours-time {
+            font-size: 2em;
+            font-weight: bold;
+            color: #000000;
+        }
+        .divider {
+            width: 2px;
+            background-color: #000000;
+            align-self: stretch;
+        }
+        @media (max-width: 768px) {
+            .divider {
+                display: none;
+            }
+            .hours-grid {
+                gap: 40px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="hours-container">
-        <h1>BYU Law Library Hours</h1>
-        <!-- LibCal Today's Hours Widget -->
-        <div id="libcal-hours"></div>
+        <h1>TODAY'S LIBRARY HOURS</h1>
+        <div class="hours-grid">
+            <div class="location">
+                <div class="location-name">MAIN FLOOR</div>
+                <div class="hours-time" id="main-floor-hours">Loading...</div>
+            </div>
+            <div class="divider"></div>
+            <div class="location">
+                <div class="location-name">THIRD FLOOR</div>
+                <div class="hours-time" id="third-floor-hours">Loading...</div>
+            </div>
+        </div>
     </div>
     
-    <!-- LibCal Today's Hours Script -->
     <script>
-        fetch('https://law.byu.libcal.com/api_hours_today.php?lid=1098&format=html&systemTime=0')
-            .then(response => response.text())
+        // Fetch Main Floor hours (lid=1098)
+        fetch('https://law.byu.libcal.com/api_hours_today.php?lid=1098&format=json&systemTime=0')
+            .then(response => response.json())
             .then(data => {
-                document.getElementById('libcal-hours').innerHTML = data;
+                if (data && data.locations && data.locations[0]) {
+                    const location = data.locations[0];
+                    const rendered = location.rendered || 'Closed';
+                    document.getElementById('main-floor-hours').textContent = rendered;
+                }
             })
             .catch(error => {
-                console.error('Error loading library hours:', error);
-                document.getElementById('libcal-hours').innerHTML = '<p>Unable to load hours at this time.</p>';
+                console.error('Error loading main floor hours:', error);
+                document.getElementById('main-floor-hours').textContent = 'N/A';
+            });
+
+        // You'll need to get the location ID for Third Floor/Reference
+        // For now, using a placeholder - replace with actual lid when you have it
+        fetch('https://law.byu.libcal.com/api_hours_today.php?lid=THIRD_FLOOR_LID&format=json&systemTime=0')
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.locations && data.locations[0]) {
+                    const location = data.locations[0];
+                    const rendered = location.rendered || 'Closed';
+                    document.getElementById('third-floor-hours').textContent = rendered;
+                }
+            })
+            .catch(error => {
+                console.error('Error loading third floor hours:', error);
+                // Placeholder hours for now
+                document.getElementById('third-floor-hours').textContent = '7:00 AM - 6 PM';
             });
     </script>
 </body>
